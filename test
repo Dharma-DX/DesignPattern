@@ -1,102 +1,55 @@
 using System;
+using System.Collections.Generic;
 
-public interface IDocument
+// The IObserver interface declares the Update method, which is called to notify the observer of changes.
+public interface IObserver
 {
-    // Method to open the document
-    void Open();
-    // Method to save the document
-    void Save();
+    void Update(string message);
 }
 
-public class WordDocument : IDocument
+// The ConcreteObserver class implements the IObserver interface and defines the Update method.
+public class EmailSubscriber : IObserver
 {
-    // Implementation of the Open method for Word documents
-    public void Open()
+    private string _email;
+
+    public EmailSubscriber(string email)
     {
-        Console.WriteLine("Opening Word document...");
+        _email = email;
     }
 
-    // Implementation of the Save method for Word documents
-    public void Save()
+    // The Update method is called when the subject's state changes.
+    public void Update(string message)
     {
-        Console.WriteLine("Saving Word document...");
-    }
-}
-
-public class PdfDocument : IDocument
-{
-    // Implementation of the Open method for PDF documents
-    public void Open()
-    {
-        Console.WriteLine("Opening PDF document...");
-    }
-
-    // Implementation of the Save method for PDF documents
-    public void Save()
-    {
-        Console.WriteLine("Saving PDF document...");
+        Console.WriteLine($"Email sent to {_email}: {message}");
     }
 }
 
-public class ExcelDocument : IDocument
+// The Subject class maintains a list of observers and notifies them of any state changes.
+public class Newsletter
 {
-    // Implementation of the Open method for Excel documents
-    public void Open()
+    private List<IObserver> _subscribers = new List<IObserver>();
+    private string _latestIssue;
+
+    // The Attach method adds an observer to the list.
+    public void Subscribe(IObserver subscriber)
     {
-        Console.WriteLine("Opening Excel document...");
+        _subscribers.Add(subscriber);
     }
 
-    // Implementation of the Save method for Excel documents
-    public void Save()
+    // The Notify method calls the Update method on each observer.
+    public void NotifySubscribers()
     {
-        Console.WriteLine("Saving Excel document...");
-    }
-}
-
-public abstract class DocumentCreator
-{
-    // Abstract factory method to create a document
-    public abstract IDocument FactoryMethod();
-
-    // Method to open a document using the factory method
-    public void OpenDocument()
-    {
-        var document = FactoryMethod();
-        document.Open();
+        foreach (var subscriber in _subscribers)
+        {
+            subscriber.Update(_latestIssue);
+        }
     }
 
-    // Method to save a document using the factory method
-    public void SaveDocument()
+    // The Publish method sets the latest issue and notifies subscribers.
+    public void Publish(string issue)
     {
-        var document = FactoryMethod();
-        document.Save();
-    }
-}
-
-public class WordDocumentCreator : DocumentCreator
-{
-    // Factory method to create a Word document
-    public override IDocument FactoryMethod()
-    {
-        return new WordDocument();
-    }
-}
-
-public class PdfDocumentCreator : DocumentCreator
-{
-    // Factory method to create a PDF document
-    public override IDocument FactoryMethod()
-    {
-        return new PdfDocument();
-    }
-}
-
-public class ExcelDocumentCreator : DocumentCreator
-{
-    // Factory method to create an Excel document
-    public override IDocument FactoryMethod()
-    {
-        return new ExcelDocument();
+        _latestIssue = issue;
+        NotifySubscribers();
     }
 }
 
@@ -104,21 +57,18 @@ public class Program
 {
     public static void Main()
     {
-        DocumentCreator creator;
+        // Create a newsletter (subject)
+        Newsletter newsletter = new Newsletter();
 
-        // Create and use a Word document
-        creator = new WordDocumentCreator();
-        creator.OpenDocument();
-        creator.SaveDocument();
+        // Create subscribers (observers)
+        IObserver subscriber1 = new EmailSubscriber("subscriber1@example.com");
+        IObserver subscriber2 = new EmailSubscriber("subscriber2@example.com");
 
-        // Create and use a PDF document
-        creator = new PdfDocumentCreator();
-        creator.OpenDocument();
-        creator.SaveDocument();
+        // Subscribe to the newsletter
+        newsletter.Subscribe(subscriber1);
+        newsletter.Subscribe(subscriber2);
 
-        // Create and use an Excel document
-        creator = new ExcelDocumentCreator();
-        creator.OpenDocument();
-        creator.SaveDocument();
+        // Publish a new issue and notify subscribers
+        newsletter.Publish("New issue of the newsletter is out!");
     }
 }
