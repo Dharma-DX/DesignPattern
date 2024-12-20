@@ -1,55 +1,50 @@
 using System;
-using System.Collections.Generic;
 
-// The IObserver interface declares the Update method, which is called to notify the observer of changes.
-public interface IObserver
+// The Component abstract class defines an interface for objects that can have responsibilities added to them dynamically.
+public abstract class Component
 {
-    void Update(string message);
+    public abstract void Operation();
 }
 
-// The ConcreteObserver class implements the IObserver interface and defines the Update method.
-public class EmailSubscriber : IObserver
+// The ConcreteComponent class is a basic implementation of the Component interface.
+public class ConcreteComponent : Component
 {
-    private string _email;
-
-    public EmailSubscriber(string email)
+    // The Operation method performs the basic operation.
+    public override void Operation()
     {
-        _email = email;
-    }
-
-    // The Update method is called when the subject's state changes.
-    public void Update(string message)
-    {
-        Console.WriteLine($"Email sent to {_email}: {message}");
+        Console.WriteLine("ConcreteComponent.Operation()");
     }
 }
 
-// The Subject class maintains a list of observers and notifies them of any state changes.
-public class Newsletter
+// The Decorator abstract class inherits from Component and contains a reference to a Component object.
+public abstract class Decorator : Component
 {
-    private List<IObserver> _subscribers = new List<IObserver>();
-    private string _latestIssue;
+    protected Component _component;
 
-    // The Attach method adds an observer to the list.
-    public void Subscribe(IObserver subscriber)
+    // The SetComponent method sets the Component object to be decorated.
+    public void SetComponent(Component component)
     {
-        _subscribers.Add(subscriber);
+        _component = component;
     }
 
-    // The Notify method calls the Update method on each observer.
-    public void NotifySubscribers()
+    // The Operation method calls the Operation method of the Component object if it exists.
+    public override void Operation()
     {
-        foreach (var subscriber in _subscribers)
+        if (_component != null)
         {
-            subscriber.Update(_latestIssue);
+            _component.Operation();
         }
     }
+}
 
-    // The Publish method sets the latest issue and notifies subscribers.
-    public void Publish(string issue)
+// The ConcreteDecorator class inherits from Decorator and adds additional behavior to the Component object.
+public class ConcreteDecorator : Decorator
+{
+    // The Operation method calls the base Operation method and then adds additional behavior.
+    public override void Operation()
     {
-        _latestIssue = issue;
-        NotifySubscribers();
+        base.Operation();
+        Console.WriteLine("ConcreteDecorator.Operation()");
     }
 }
 
@@ -57,18 +52,16 @@ public class Program
 {
     public static void Main()
     {
-        // Create a newsletter (subject)
-        Newsletter newsletter = new Newsletter();
+        // Create a ConcreteComponent object.
+        ConcreteComponent component = new ConcreteComponent();
 
-        // Create subscribers (observers)
-        IObserver subscriber1 = new EmailSubscriber("subscriber1@example.com");
-        IObserver subscriber2 = new EmailSubscriber("subscriber2@example.com");
+        // Create a ConcreteDecorator object.
+        ConcreteDecorator decorator = new ConcreteDecorator();
 
-        // Subscribe to the newsletter
-        newsletter.Subscribe(subscriber1);
-        newsletter.Subscribe(subscriber2);
+        // Set the ConcreteComponent object to be decorated by the ConcreteDecorator.
+        decorator.SetComponent(component);
 
-        // Publish a new issue and notify subscribers
-        newsletter.Publish("New issue of the newsletter is out!");
+        // Call the Operation method on the ConcreteDecorator, which adds additional behavior to the ConcreteComponent.
+        decorator.Operation();
     }
 }
