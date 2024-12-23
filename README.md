@@ -14,7 +14,7 @@ This repository contains examples of various design patterns implemented in C#. 
   - Strategy
 
 ## How to Use
-1. Clone the repository: `git clone https://github.com/yourusername/DesignPatterns.git`
+1. Clone the repository: `git clone https://github.com/dharma-dx/DesignPatterns.git`
 2. Navigate to the desired pattern folder.
 3. Open the solution file in Visual Studio or your preferred IDE.
 4. Run the example to see the pattern in action.
